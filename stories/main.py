@@ -7,7 +7,7 @@ import random
 from pathlib import Path
 
 # Set the path for ImageMagick executable
-change_settings({"IMAGEMAGICK_BINARY": r"D:\\Program Files\\ImageMagick-7.1.1-Q16-HDRI\\magick.exe"})
+change_settings({"IMAGEMAGICK_BINARY": r"D:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"})
 
 # The folder containing background videos
 BGVideosDirectory = r"D:\videos\stories\BGVideos"
@@ -38,7 +38,7 @@ for video in videos:
     BGVideoIndex = random.randint(0, len(BGVideos)-1)
 
     contentVideo = VideoFileClip(os.path.join(originalVideosDirectory, video))
-    videoBG = VideoFileClip(BGVideosDirectory+videoPath+"/"+BGVideos[BGVideoIndex])
+    videoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex])
 
     videoBGDuration = videoBG.duration  # keeping track of the used videos
     usedBGVideos.append(BGVideoIndex)
@@ -55,7 +55,7 @@ for video in videos:
                     usedBGVideos.append(BGVideoIndex)
                     break
             # add the next BG video to the end of the previous one
-            newVideoBG = VideoFileClip(BGVideosDirectory+videoPath+"/"+BGVideos[BGVideoIndex]).set_start(videoBGDuration)
+            newVideoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex]).set_start(videoBGDuration)
             videoBGDuration += newVideoBG.duration
             videoBG = CompositeVideoClip([videoBG, newVideoBG])
         else:
@@ -93,7 +93,8 @@ for video in videos:
             part += 1
         else:
             # select a like video croma
-            likeVid = fr"{likeVideos}\{os.listdir(likeVideos)[random.randint(0, len(likeVideos)-1)]}"
+            likeVid = fr"{likeVideos}\{os.listdir(likeVideos)[random.randint(0, len(os.listdir(likeVideos))-1)]}"
+            likeVid = VideoFileClip(likeVid)
             likeVid = likeVid.fx(mpy.vfx.mask_color, color=[0, 213, 0], thr=100, s=5)
             likeVid = likeVid.set_start(random.randint(7, 15))
             # Center the video in the middle bottom
@@ -116,9 +117,9 @@ for video in videos:
             titleClip = (TextClip(f"{video[:-4]}",
                                   fontsize=80,
                                   stroke_color='black',
-                                  stroke_width=1,
+                                  stroke_width=2,
                                   color='white',
-                                  font='Calibre-Bold',
+                                  font='Cairo-Regular',
                                   method='caption',
                                   align='center',
                                   size=tiktok_resolution)
@@ -127,7 +128,7 @@ for video in videos:
 
             final_part_clip = CompositeVideoClip([final_clip.subclip(partStart, partEnd),
                                                   partClip, titleClip, followVid, likeVid],
-                                                 size=tiktok_resolution)
+                                                 size=tiktok_resolution).subclip(0,3)
 
             final_part_clip.write_videofile(rf'{outputDirectory}\part_{part}.mp4',
                                             codec='libx264',
