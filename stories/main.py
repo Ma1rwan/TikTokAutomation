@@ -82,22 +82,30 @@ for video in videos:
     if not directory.exists():
         directory.mkdir(parents=True, exist_ok=True)
     while part <= parts:
+        if part < 3:
+            clipEnd = min(clipStart + max_clip_duration, videoDuration)
+            clipStart = clipEnd - random.randint(4, 8)
+            clipStart = max(0, clipStart)  # Ensure clipStart does not go negative
 
-        clipEnd = min(clipStart + max_clip_duration, videoDuration)
+            part += 1
+        else:
 
-        partClip = TextClip(f"part{part}", fontsize=100, stroke_color='black', stroke_width=5, color='white',
-                            font='Arial-Bold', method='caption', align='center', size=tiktok_resolution).set_duration(
-            clipEnd - clipStart).set_position(('center', 'top'))
+            clipEnd = min(clipStart + max_clip_duration, videoDuration)
 
-        titleClip = TextClip(f"{video[:-4]}", fontsize=80, stroke_color='black', stroke_width=1, color='white',
-                            font='Calibri-Bold', method='caption', align='center', size=tiktok_resolution).set_duration(5).set_position(
-            ('center', -500))
+            partClip = TextClip(f"part{part}", fontsize=100, stroke_color='black', stroke_width=5, color='white',
+                                font='Arial-Bold', method='caption', align='center', size=tiktok_resolution).set_duration(
+                clipEnd - clipStart).set_position(('center', 'top'))
 
-        final_part_clip = CompositeVideoClip([final_clip.subclip(clipStart, clipEnd), partClip, titleClip, followVid], size=tiktok_resolution)
-        final_part_clip.write_videofile(rf'D:\videos\stories\outputStories\{video[:-4]}\part_{part}.mp4',
-                                        codec='libx264', fps=30, threads=4, preset='ultrafast')
+            titleClip = TextClip(f"{video[:-4]}", fontsize=80, stroke_color='black', stroke_width=1, color='white',
+                                font='Calibri-Bold', method='caption', align='center', size=tiktok_resolution).set_duration(5).set_position(
+                ('center', -500))
 
-        clipStart = clipEnd - random.randint(4, 8)
-        clipStart = max(0, clipStart)  # Ensure clipStart does not go negative
+            final_part_clip = CompositeVideoClip([final_clip.subclip(clipStart, clipEnd), partClip, titleClip, followVid], size=tiktok_resolution)
+            final_part_clip.write_videofile(rf'D:\videos\stories\outputStories\{video[:-4]}\part_{part}.mp4',
+                                            codec='libx264', fps=30, threads=4, preset='ultrafast')
 
-        part += 1
+            clipStart = clipEnd - random.randint(4, 8)
+            clipStart = max(0, clipStart)  # Ensure clipStart does not go negative
+
+            part += 1
+    break
