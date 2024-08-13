@@ -82,7 +82,7 @@ for video in videos:
     if not directory.exists():
         directory.mkdir(parents=True, exist_ok=True)
     while part <= parts:
-        if part < 3:
+        if part < 0:
             clipEnd = min(clipStart + max_clip_duration, videoDuration)
             clipStart = clipEnd - random.randint(4, 8)
             clipStart = max(0, clipStart)  # Ensure clipStart does not go negative
@@ -108,4 +108,3 @@ for video in videos:
             clipStart = max(0, clipStart)  # Ensure clipStart does not go negative
 
             part += 1
-    break
