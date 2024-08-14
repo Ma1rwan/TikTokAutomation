@@ -39,7 +39,7 @@ for video in videos:
 
     contentVideo = VideoFileClip(os.path.join(originalVideosDirectory, video))
     videoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex])
-
+    videoBG = videoBG.subclip(3, videoBG.duration).set_start(0)
     videoBGDuration = videoBG.duration  # keeping track of the used videos
     usedBGVideos.append(BGVideoIndex)
 
@@ -55,7 +55,8 @@ for video in videos:
                     usedBGVideos.append(BGVideoIndex)
                     break
             # add the next BG video to the end of the previous one
-            newVideoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex]).set_start(videoBGDuration)
+            newVideoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex])
+            newVideoBG = newVideoBG.subclip(3, newVideoBG.duration).set_start(videoBGDuration)
             videoBGDuration += newVideoBG.duration
             videoBG = CompositeVideoClip([videoBG, newVideoBG])
         else:
@@ -117,9 +118,9 @@ for video in videos:
             titleClip = (TextClip(f"{video[:-4]}",
                                   fontsize=80,
                                   stroke_color='black',
-                                  stroke_width=2,
+                                  stroke_width=1,
                                   color='white',
-                                  font='',
+                                  font='Cairo-Bold',
                                   method='caption',
                                   align='center',
                                   size=tiktok_resolution)
@@ -128,7 +129,7 @@ for video in videos:
 
             final_part_clip = CompositeVideoClip([final_clip.subclip(partStart, partEnd),
                                                   partClip, titleClip, followVid, likeVid],
-                                                 size=tiktok_resolution).subclip(0,3)
+                                                 size=tiktok_resolution)
 
             final_part_clip.write_videofile(rf'{outputDirectory}\part_{part}.mp4',
                                             codec='libx264',
