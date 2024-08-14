@@ -119,7 +119,7 @@ for video in videos:
                                   stroke_color='black',
                                   stroke_width=2,
                                   color='white',
-                                  font='Cairo-Regular',
+                                  font='',
                                   method='caption',
                                   align='center',
                                   size=tiktok_resolution)
