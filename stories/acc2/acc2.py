@@ -45,31 +45,34 @@ for video in videos:
     usedBGVideos.append(BGVideoIndex)
 
     videoDuration = contentVideo.duration
-    while True:
-        if videoDuration >= videoBGDuration:  # loop until the BG video is longer than the original video
-            while True:
-                #  make sure we don't use the same BG video twice in a row
-                if len(usedBGVideos) == len(BGVideos):
-                    usedBGVideos = []
-                BGVideoIndex = random.randint(0, len(BGVideos) - 1)
-                if BGVideoIndex not in usedBGVideos:
-                    usedBGVideos.append(BGVideoIndex)
-                    break
-            # add the next BG video to the end of the previous one
-            newVideoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex])
-            newVideoBG = newVideoBG.subclip(3, newVideoBG.duration).set_start(videoBGDuration)
-            videoBGDuration += newVideoBG.duration
-            videoBG = CompositeVideoClip([videoBG, newVideoBG])
-        else:
-            break
-    videoBG.subclip(0, videoDuration)   # make the BG video and the original one the same duration
+    if videoBGDuration > 3600:
+        startBG = random.randint(0, (math.floor(videoBGDuration) - math.floor(videoDuration)))
+        videoBG = videoBG.subclip(startBG, math.floor(videoBGDuration))
+        videoBG = videoBG.set_start(0)
+    else:
+        while True:
+            if videoDuration >= videoBGDuration:  # loop until the BG video is longer than the original video
+                while True:
+                    #  make sure we don't use the same BG video twice in a row
+                    if len(usedBGVideos) == len(BGVideos):
+                        usedBGVideos = []
+                    BGVideoIndex = random.randint(0, len(BGVideos) - 1)
+                    if BGVideoIndex not in usedBGVideos:
+                        usedBGVideos.append(BGVideoIndex)
+                        break
+                # add the next BG video to the end of the previous one
+                newVideoBG = VideoFileClip(videoPath+"/"+BGVideos[BGVideoIndex])
+                newVideoBG = newVideoBG.subclip(3, newVideoBG.duration).set_start(videoBGDuration)
+                videoBGDuration += newVideoBG.duration
+                videoBG = CompositeVideoClip([videoBG, newVideoBG])
+            else:
+                break
+    videoBG.subclip(0, videoDuration)  # make the BG video and the original one the same duration
 
     contentVideo_audio = contentVideo.audio  # extract the audio from the content video
     # Give the BG video a TikTok ratio
     # Crop the video to fit the TikTok aspect ratio
-    videoBG_resized = videoBG.crop(x_center=videoBG.w / 2, y_center=videoBG.h / 2, width=videoBG.w, height=videoBG.w)
-
-    videoBG_resized = videoBG_resized.resize(newsize=(tiktok_resolution[0], tiktok_resolution[1]))
+    videoBG_resized = videoBG.resize(newsize=(tiktok_resolution[0], tiktok_resolution[1]))
 
     videoBG_resized = videoBG_resized.without_audio()  # Remove BG audio
     final_clip = videoBG_resized.set_audio(contentVideo_audio)  # set the extracted audio
@@ -133,7 +136,7 @@ for video in videos:
 
             final_part_clip = CompositeVideoClip([final_clip.subclip(partStart, partEnd),
                                                   partClip, titleClip, followVid, likeVid],
-                                                 size=tiktok_resolution).subclip(0,3)
+                                                 size=tiktok_resolution)
 
             final_part_clip.write_videofile(rf'{outputDirectory}\part_{part}.mp4',
                                             codec='libx264',
